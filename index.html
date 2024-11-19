@@ -3,183 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Problem Solving Timer</title>
+    <title>Problem Solving Tracker</title>
     <style>
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
+            margin: 0;
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom right, #1f4037, #99f2c8);
+            background-color: #1d3529;
+            color: #d8f3dc;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
-            color: #fff;
+            justify-content: center;
+            min-height: 100vh;
         }
-
         .container {
+            background-color: #081c15;
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 30px;
-            border-radius: 15px;
+            max-width: 500px;
             width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
-
-        h1 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        label {
-            font-size: 18px;
-            margin-bottom: 10px;
-            display: block;
-            font-weight: 500;
-        }
-
-        input, button {
-            width: 100%;
-            padding: 12px;
+        h1, h2, h3 {
             margin: 10px 0;
-            font-size: 16px;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
             border: none;
             border-radius: 8px;
-            outline: none;
         }
-
         input {
-            background: #e8f0fe;
-            color: #333;
+            width: 70%;
+            font-size: 16px;
         }
-
         button {
-            background: #34d399;
+            background-color: #40916c;
             color: #fff;
+            font-weight: bold;
             cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s ease;
+            transition: background-color 0.3s;
         }
-
         button:hover {
-            background: #10b981;
+            background-color: #52b788;
         }
-
-        .timer {
-            font-size: 36px;
-            font-weight: bold;
+        .stats {
             margin: 20px 0;
+            background-color: #134e4a;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
-
-        .status {
-            font-size: 18px;
-            font-weight: 500;
-            margin: 20px 0;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .actions button {
-            width: 48%;
-            background: #ff6b6b;
-            transition: background 0.3s ease;
-        }
-
-        .actions button:hover {
-            background: #ee5253;
-        }
-
-        .solved-btn {
-            background: #2ecc71;
-        }
-
-        .solved-btn:hover {
-            background: #27ae60;
-        }
-
-        .counter {
-            font-size: 18px;
-            margin-top: 10px;
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #a8dadc;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Problem Solving Timer</h1>
-        <label for="timeInput">Set Time (in seconds):</label>
-        <input type="number" id="timeInput" placeholder="Enter seconds" min="1">
-        <button onclick="startTimer()">Start Timer</button>
-        <div class="timer" id="timerDisplay">00:00</div>
-        <div class="status">
-            <p>Problems Solved: <span id="solvedCount">0</span></p>
-            <p>Problems Unsolved: <span id="unsolvedCount">0</span></p>
+        <h1>"Empty your mind. Become formless and shapeless like water."</h1>
+        <h2>- Bruce Lee</h2>
+        <h2 id="greeting">Welcome! What’s your name?</h2>
+        <div id="nameInput">
+            <input type="text" id="userName" placeholder="Enter your name">
+            <button onclick="saveName()">Submit</button>
         </div>
-        <div class="actions" id="actions" style="display: none;">
-            <button class="solved-btn" onclick="markSolved()">Solved</button>
-            <button onclick="markUnsolved()">Unsolved</button>
+        <div id="tracker" style="display: none;">
+            <h3 id="userMessage"></h3>
+            <input type="number" id="timeInput" placeholder="Enter study time (minutes)" min="1">
+            <select id="subjectSelect">
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Mathematics">Mathematics</option>
+            </select>
+            <button onclick="addStudyTime()">Add Study Time</button>
+            <button onclick="markQuestionSolved()">Mark Question Solved</button>
+            <button onclick="markQuestionUnsolved()">Mark Question Not Solved</button>
+            <div class="stats">
+                <h3>Statistics</h3>
+                <p>Total Minutes Studied Today: <span id="todayTime">0</span></p>
+                <p>Total Minutes Studied This Week: <span id="weekTime">0</span></p>
+                <p>Total Minutes Studied This Year: <span id="yearTime">0</span></p>
+                <p>Questions Solved (Physics): <span id="physicsSolved">0</span></p>
+                <p>Questions Solved (Chemistry): <span id="chemistrySolved">0</span></p>
+                <p>Questions Solved (Mathematics): <span id="mathSolved">0</span></p>
+            </div>
         </div>
     </div>
-
+    <footer>Made with 💚 for NSEP and JEE Advanced Aspirants</footer>
     <script>
-        let timer;
-        let secondsRemaining = 0;
-        let solvedCount = 0;
-        let unsolvedCount = 0;
+        const todayKey = "studyToday";
+        const weekKey = "studyWeek";
+        const yearKey = "studyYear";
+        const subjects = {
+            Physics: "physicsSolved",
+            Chemistry: "chemistrySolved",
+            Mathematics: "mathSolved"
+        };
 
-        function startTimer() {
-            clearInterval(timer); // Clear any running timer
-            const timeInput = document.getElementById('timeInput').value;
-            secondsRemaining = parseInt(timeInput);
-            if (isNaN(secondsRemaining) || secondsRemaining <= 0) {
-                alert('Please enter a valid time in seconds.');
+        // Load name and stats
+        window.onload = () => {
+            const name = localStorage.getItem("userName");
+            if (name) {
+                document.getElementById("greeting").textContent = `Welcome back, ${name}!`;
+                document.getElementById("tracker").style.display = "block";
+                document.getElementById("nameInput").style.display = "none";
+                document.getElementById("userMessage").textContent = `You are the best, ${name}! You can do it!`;
+            }
+            loadStats();
+        };
+
+        // Save name
+        const saveName = () => {
+            const name = document.getElementById("userName").value.trim();
+            if (name) {
+                localStorage.setItem("userName", name);
+                document.getElementById("greeting").textContent = `Welcome, ${name}!`;
+                document.getElementById("tracker").style.display = "block";
+                document.getElementById("nameInput").style.display = "none";
+                document.getElementById("userMessage").textContent = `You are the best, ${name}! You can do it!`;
+            }
+        };
+
+        // Add study time
+        const addStudyTime = () => {
+            const time = parseInt(document.getElementById("timeInput").value);
+            if (isNaN(time) || time <= 0) {
+                alert("Please enter a valid time in minutes.");
                 return;
             }
-            document.getElementById('actions').style.display = 'none'; // Hide actions
-            updateTimerDisplay();
-            timer = setInterval(countDown, 1000);
-        }
+            updateStats(todayKey, time);
+            updateStats(weekKey, time);
+            updateStats(yearKey, time);
+            loadStats();
+        };
 
-        function countDown() {
-            if (secondsRemaining > 0) {
-                secondsRemaining--;
-                updateTimerDisplay();
-            } else {
-                clearInterval(timer);
-                document.getElementById('actions').style.display = 'flex'; // Show actions
-            }
-        }
+        // Mark question solved
+        const markQuestionSolved = () => {
+            const subject = document.getElementById("subjectSelect").value;
+            updateStats(subjects[subject], 1);
+            loadStats();
+        };
 
-        function updateTimerDisplay() {
-            const minutes = Math.floor(secondsRemaining / 60);
-            const seconds = secondsRemaining % 60;
-            document.getElementById('timerDisplay').textContent =
-                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
+        // Mark question not solved
+        const markQuestionUnsolved = () => {
+            alert("Keep trying! You can do it next time!");
+        };
 
-        function markSolved() {
-            solvedCount++;
-            document.getElementById('solvedCount').textContent = solvedCount;
-            document.getElementById('actions').style.display = 'none';
-            startTimer();
-        }
+        // Update stats in local storage
+        const updateStats = (key, value) => {
+            const current = parseInt(localStorage.getItem(key)) || 0;
+            localStorage.setItem(key, current + value);
+        };
 
-        function markUnsolved() {
-            unsolvedCount++;
-            document.getElementById('unsolvedCount').textContent = unsolvedCount;
-            document.getElementById('actions').style.display = 'none';
-            startTimer();
-        }
+        // Load stats from local storage
+        const loadStats = () => {
+            document.getElementById("todayTime").textContent = localStorage.getItem(todayKey) || 0;
+            document.getElementById("weekTime").textContent = localStorage.getItem(weekKey) || 0;
+            document.getElementById("yearTime").textContent = localStorage.getItem(yearKey) || 0;
+            document.getElementById("physicsSolved").textContent = localStorage.getItem(subjects.Physics) || 0;
+            document.getElementById("chemistrySolved").textContent = localStorage.getItem(subjects.Chemistry) || 0;
+            document.getElementById("mathSolved").textContent = localStorage.getItem(subjects.Mathematics) || 0;
+        };
     </script>
 </body>
 </html>
