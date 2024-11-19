@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem Solving Timer</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom right, #1f4037, #99f2c8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        label {
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: 500;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        input {
+            background: #e8f0fe;
+            color: #333;
+        }
+
+        button {
+            background: #34d399;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #10b981;
+        }
+
+        .timer {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .status {
+            font-size: 18px;
+            font-weight: 500;
+            margin: 20px 0;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .actions button {
+            width: 48%;
+            background: #ff6b6b;
+            transition: background 0.3s ease;
+        }
+
+        .actions button:hover {
+            background: #ee5253;
+        }
+
+        .solved-btn {
+            background: #2ecc71;
+        }
+
+        .solved-btn:hover {
+            background: #27ae60;
+        }
+
+        .counter {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Problem Solving Timer</h1>
+        <label for="timeInput">Set Time (in seconds):</label>
+        <input type="number" id="timeInput" placeholder="Enter seconds" min="1">
+        <button onclick="startTimer()">Start Timer</button>
+        <div class="timer" id="timerDisplay">00:00</div>
+        <div class="status">
+            <p>Problems Solved: <span id="solvedCount">0</span></p>
+            <p>Problems Unsolved: <span id="unsolvedCount">0</span></p>
+        </div>
+        <div class="actions" id="actions" style="display: none;">
+            <button class="solved-btn" onclick="markSolved()">Solved</button>
+            <button onclick="markUnsolved()">Unsolved</button>
+        </div>
+    </div>
+
+    <script>
+        let timer;
+        let secondsRemaining = 0;
+        let solvedCount = 0;
+        let unsolvedCount = 0;
+
+        function startTimer() {
+            clearInterval(timer); // Clear any running timer
+            const timeInput = document.getElementById('timeInput').value;
+            secondsRemaining = parseInt(timeInput);
+            if (isNaN(secondsRemaining) || secondsRemaining <= 0) {
+                alert('Please enter a valid time in seconds.');
+                return;
+            }
+            document.getElementById('actions').style.display = 'none'; // Hide actions
+            updateTimerDisplay();
+            timer = setInterval(countDown, 1000);
+        }
+
+        function countDown() {
+            if (secondsRemaining > 0) {
+                secondsRemaining--;
+                updateTimerDisplay();
+            } else {
+                clearInterval(timer);
+                document.getElementById('actions').style.display = 'flex'; // Show actions
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(secondsRemaining / 60);
+            const seconds = secondsRemaining % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function markSolved() {
+            solvedCount++;
+            document.getElementById('solvedCount').textContent = solvedCount;
+            document.getElementById('actions').style.display = 'none';
+            startTimer();
+        }
+
+        function markUnsolved() {
+            unsolvedCount++;
+            document.getElementById('unsolvedCount').textContent = unsolvedCount;
+            document.getElementById('actions').style.display = 'none';
+            startTimer();
+        }
+    </script>
+</body>
+</html>
