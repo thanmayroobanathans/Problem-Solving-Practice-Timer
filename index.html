@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Problem Solving Tracker</title>
+    <title>Problem-Solving Tracker</title>
     <style>
         body {
             margin: 0;
@@ -28,7 +28,7 @@
         h1, h2, h3 {
             margin: 10px 0;
         }
-        input, button {
+        input, button, select {
             margin: 10px;
             padding: 10px;
             border: none;
@@ -64,7 +64,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>"Empty your mind. Become formless and shapeless like water. When water is poured into a cup, it becomes the cup. When water is poured into a teapot, it becomes the teapot. Be water, my friend."</h1>
+        <h1>"Empty your mind. Become formless and shapeless like water."</h1>
         <h2>- Bruce Lee</h2>
         <h2 id="greeting">Welcome! What’s your name?</h2>
         <div id="nameInput">
@@ -73,38 +73,37 @@
         </div>
         <div id="tracker" style="display: none;">
             <h3 id="userMessage"></h3>
-            <input type="number" id="timeInput" placeholder="Enter study time (minutes)" min="1">
             <select id="subjectSelect">
                 <option value="Physics">Physics</option>
                 <option value="Chemistry">Chemistry</option>
                 <option value="Mathematics">Mathematics</option>
             </select>
-            <button onclick="addStudyTime()">Add Study time</button>
-            <button onclick="markQuestionSolved()">Mark Question Solved</button>
-            <button onclick="markQuestionUnsolved()">Mark Question Not Solved</button>
+            <button onclick="startTimer()">Start Timer</button>
+            <button onclick="markSolved()">Mark as Solved</button>
+            <button onclick="markUnsolved()">Mark as Unsolved</button>
+            <p id="timerDisplay">Timer: 0:00</p>
             <div class="stats">
                 <h3>Statistics</h3>
-                <p>Total Minutes Studied Today: <span id="todayTime">0</span></p>
-                <p>Total Minutes Studied This Week: <span id="weekTime">0</span></p>
-                <p>Total Minutes Studied This Year: <span id="yearTime">0</span></p>
                 <p>Questions Solved (Physics): <span id="physicsSolved">0</span></p>
+                <p>Questions Unsolved (Physics): <span id="physicsUnsolved">0</span></p>
                 <p>Questions Solved (Chemistry): <span id="chemistrySolved">0</span></p>
+                <p>Questions Unsolved (Chemistry): <span id="chemistryUnsolved">0</span></p>
                 <p>Questions Solved (Mathematics): <span id="mathSolved">0</span></p>
+                <p>Questions Unsolved (Mathematics): <span id="mathUnsolved">0</span></p>
             </div>
         </div>
     </div>
     <footer>Made with 💚 for NSEP and JEE Advanced Aspirants</footer>
     <script>
-        const todayKey = "studyToday";
-        const weekKey = "studyWeek";
-        const yearKey = "studyYear";
+        let timer = null;
+        let timeElapsed = 0;
+
         const subjects = {
-            Physics: "physicsSolved",
-            Chemistry: "chemistrySolved",
-            Mathematics: "mathSolved"
+            Physics: { solved: "physicsSolved", unsolved: "physicsUnsolved" },
+            Chemistry: { solved: "chemistrySolved", unsolved: "chemistryUnsolved" },
+            Mathematics: { solved: "mathSolved", unsolved: "mathUnsolved" },
         };
 
-        // Load name and stats
         window.onload = () => {
             const name = localStorage.getItem("userName");
             if (name) {
@@ -116,7 +115,6 @@
             loadStats();
         };
 
-        // Save name
         const saveName = () => {
             const name = document.getElementById("userName").value.trim();
             if (name) {
@@ -128,45 +126,45 @@
             }
         };
 
-        // Add study time
-        const addStudyTime = () => {
-            const time = parseInt(document.getElementById("timeInput").value);
-            if (isNaN(time) || time <= 0) {
-                alert("Please enter a valid time in minutes.");
-                return;
-            }
-            updateStats(todayKey, time);
-            updateStats(weekKey, time);
-            updateStats(yearKey, time);
-            loadStats();
+        const startTimer = () => {
+            if (timer) clearInterval(timer);
+            timeElapsed = 0;
+            timer = setInterval(() => {
+                timeElapsed++;
+                document.getElementById("timerDisplay").textContent = `Timer: ${Math.floor(timeElapsed / 60)}:${(timeElapsed % 60).toString().padStart(2, "0")}`;
+            }, 1000);
         };
 
-        // Mark question solved
-        const markQuestionSolved = () => {
+        const markSolved = () => {
             const subject = document.getElementById("subjectSelect").value;
-            updateStats(subjects[subject], 1);
-            loadStats();
+            updateStats(subjects[subject].solved, 1);
+            resetTimer();
         };
 
-        // Mark question not solved
-        const markQuestionUnsolved = () => {
-            alert("Keep trying! You can do it next time!");
+        const markUnsolved = () => {
+            const subject = document.getElementById("subjectSelect").value;
+            updateStats(subjects[subject].unsolved, 1);
+            resetTimer();
         };
 
-        // Update stats in local storage
+        const resetTimer = () => {
+            clearInterval(timer);
+            timer = null;
+            timeElapsed = 0;
+            document.getElementById("timerDisplay").textContent = `Timer: 0:00`;
+        };
+
         const updateStats = (key, value) => {
             const current = parseInt(localStorage.getItem(key)) || 0;
             localStorage.setItem(key, current + value);
+            loadStats();
         };
 
-        // Load stats from local storage
         const loadStats = () => {
-            document.getElementById("todayTime").textContent = localStorage.getItem(todayKey) || 0;
-            document.getElementById("weekTime").textContent = localStorage.getItem(weekKey) || 0;
-            document.getElementById("yearTime").textContent = localStorage.getItem(yearKey) || 0;
-            document.getElementById("physicsSolved").textContent = localStorage.getItem(subjects.Physics) || 0;
-            document.getElementById("chemistrySolved").textContent = localStorage.getItem(subjects.Chemistry) || 0;
-            document.getElementById("mathSolved").textContent = localStorage.getItem(subjects.Mathematics) || 0;
+            Object.keys(subjects).forEach((subject) => {
+                document.getElementById(subjects[subject].solved).textContent = localStorage.getItem(subjects[subject].solved) || 0;
+                document.getElementById(subjects[subject].unsolved).textContent = localStorage.getItem(subjects[subject].unsolved) || 0;
+            });
         };
     </script>
 </body>
