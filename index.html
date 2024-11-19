@@ -83,10 +83,8 @@
                 <option value="Chemistry">Chemistry</option>
                 <option value="Mathematics">Mathematics</option>
             </select>
-            <p>Target Time Per Question (minutes):</p>
-            <input type="number" id="targetTime" placeholder="Enter minutes">
-            <button onclick="startTimer()">Start Timer</button>
-            <p id="timerDisplay">Timer: 00:00</p>
+            <p>Time Taken Per Question (in seconds):</p>
+            <input type="number" id="timeTaken" placeholder="Enter time in seconds">
             <button onclick="markSolved()">Solved</button>
             <button onclick="markUnsolved()">Not Solved</button>
 
@@ -96,6 +94,8 @@
                 <p><strong>Time Spent Today:</strong> <span id="timeToday">0</span> seconds</p>
                 <p><strong>This Week:</strong> Solved: <span id="weekSolved">0</span> | Unsolved: <span id="weekUnsolved">0</span></p>
                 <p><strong>Time Spent This Week:</strong> <span id="timeThisWeek">0</span> seconds</p>
+                <p><strong>This Year:</strong> Solved: <span id="yearSolved">0</span> | Unsolved: <span id="yearUnsolved">0</span></p>
+                <p><strong>Time Spent This Year:</strong> <span id="timeThisYear">0</span> seconds</p>
             </div>
 
             <div class="subjectStats">
@@ -108,10 +108,11 @@
     </div>
     <script>
         // Variables for tracking
-        let name, timerInterval, timerSeconds = 0;
+        let name;
         const stats = {
             daily: { solved: 0, unsolved: 0, time: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
             weekly: { solved: 0, unsolved: 0, time: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+            yearly: { solved: 0, unsolved: 0, time: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
         };
 
         function startSession() {
@@ -124,50 +125,49 @@
             document.getElementById("greeting").innerText = `Hello, ${name}! You can do it!`;
         }
 
-        function startTimer() {
-            clearInterval(timerInterval);
-            const targetMinutes = parseInt(document.getElementById("targetTime").value);
-            if (isNaN(targetMinutes) || targetMinutes <= 0) {
-                alert("Please enter a valid time.");
+        function markSolved() {
+            const timeTaken = parseInt(document.getElementById("timeTaken").value);
+            if (isNaN(timeTaken) || timeTaken <= 0) {
+                alert("Please enter a valid time in seconds.");
                 return;
             }
-            timerSeconds = targetMinutes * 60;
-            timerInterval = setInterval(() => {
-                if (timerSeconds > 0) {
-                    timerSeconds--;
-                    document.getElementById("timerDisplay").innerText = `Timer: ${Math.floor(timerSeconds / 60)}:${timerSeconds % 60 < 10 ? "0" : ""}${timerSeconds % 60}`;
-                } else {
-                    clearInterval(timerInterval);
-                    document.getElementById("timerDisplay").innerText = "Time's up!";
-                }
-            }, 1000);
-        }
-
-        function markSolved() {
-            updateStats("solved");
+            const subject = document.getElementById("subjectSelect").value;
+            updateStats("solved", timeTaken, subject);
         }
 
         function markUnsolved() {
-            updateStats("unsolved");
+            const timeTaken = parseInt(document.getElementById("timeTaken").value);
+            if (isNaN(timeTaken) || timeTaken <= 0) {
+                alert("Please enter a valid time in seconds.");
+                return;
+            }
+            const subject = document.getElementById("subjectSelect").value;
+            updateStats("unsolved", timeTaken, subject);
         }
 
-        function updateStats(type) {
-            const subject = document.getElementById("subjectSelect").value;
+        function updateStats(type, timeTaken, subject) {
             stats.daily[type]++;
             stats.weekly[type]++;
+            stats.yearly[type]++;
             stats.daily.subjects[subject]++;
             stats.weekly.subjects[subject]++;
-            stats.daily.time += timerSeconds;
+            stats.yearly.subjects[subject]++;
+            stats.daily.time += timeTaken;
+            stats.weekly.time += timeTaken;
+            stats.yearly.time += timeTaken;
 
             // Update UI
             document.getElementById("todaySolved").innerText = stats.daily.solved;
             document.getElementById("todayUnsolved").innerText = stats.daily.unsolved;
             document.getElementById("weekSolved").innerText = stats.weekly.solved;
             document.getElementById("weekUnsolved").innerText = stats.weekly.unsolved;
+            document.getElementById("yearSolved").innerText = stats.yearly.solved;
+            document.getElementById("yearUnsolved").innerText = stats.yearly.unsolved;
 
             // Time in seconds
             document.getElementById("timeToday").innerText = stats.daily.time;
             document.getElementById("timeThisWeek").innerText = stats.weekly.time;
+            document.getElementById("timeThisYear").innerText = stats.yearly.time;
 
             // Update subject-wise stats
             document.getElementById("physicsSolved").innerText = stats.daily.subjects.Physics;
