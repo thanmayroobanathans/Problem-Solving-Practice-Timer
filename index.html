@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #e8f5e9;
+            background-color: #d1e7d1; /* Darker Green */
             color: #2d3436;
             margin: 0;
             padding: 0;
@@ -19,7 +19,7 @@
 
         .container {
             text-align: center;
-            background-color: #d0e8d5;
+            background-color: #b7d8b6; /* Darker Green */
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
@@ -59,6 +59,11 @@
             font-style: italic;
             margin-bottom: 20px;
         }
+
+        .subjectStats {
+            margin-top: 20px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -93,15 +98,22 @@
                 <p><strong>Total Time Spent Today:</strong> <span id="timeToday">0:00</span></p>
                 <p><strong>Time of Last Problem:</strong> <span id="lastTime">Not Recorded</span></p>
             </div>
+
+            <div class="subjectStats">
+                <h3>Subject-wise Problem Solved</h3>
+                <p><strong>Physics:</strong> <span id="physicsSolved">0</span></p>
+                <p><strong>Chemistry:</strong> <span id="chemistrySolved">0</span></p>
+                <p><strong>Mathematics:</strong> <span id="mathSolved">0</span></p>
+            </div>
         </div>
     </div>
     <script>
         // Variables for tracking
         let name, timerInterval, timerSeconds = 0;
         const stats = {
-            daily: { solved: 0, unsolved: 0, time: 0 },
-            weekly: { solved: 0, unsolved: 0 },
-            yearly: { solved: 0, unsolved: 0 },
+            daily: { solved: 0, unsolved: 0, time: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+            weekly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+            yearly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
         };
 
         function startSession() {
@@ -148,6 +160,9 @@
             stats.daily[type]++;
             stats.weekly[type]++;
             stats.yearly[type]++;
+            stats.daily.subjects[subject]++;
+            stats.weekly.subjects[subject]++;
+            stats.yearly.subjects[subject]++;
 
             if (type === "solved") stats.daily.time += parseInt(document.getElementById("targetTime").value) * 60;
 
@@ -167,6 +182,11 @@
             const secondsSpent = stats.daily.time % 60;
             document.getElementById("timeToday").innerText = `${timeSpent}:${secondsSpent < 10 ? "0" : ""}${secondsSpent}`;
             document.getElementById("lastTime").innerText = timeString;
+
+            // Update subject-wise stats
+            document.getElementById("physicsSolved").innerText = stats.daily.subjects.Physics;
+            document.getElementById("chemistrySolved").innerText = stats.daily.subjects.Chemistry;
+            document.getElementById("mathSolved").innerText = stats.daily.subjects.Mathematics;
         }
     </script>
 </body>
