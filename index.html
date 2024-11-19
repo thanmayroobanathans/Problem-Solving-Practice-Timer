@@ -93,10 +93,9 @@
             <div class="stats">
                 <h3>Statistics</h3>
                 <p><strong>Today's Solved:</strong> <span id="todaySolved">0</span> | Unsolved: <span id="todayUnsolved">0</span></p>
+                <p><strong>Time Spent Today:</strong> <span id="timeToday">0</span> seconds</p>
                 <p><strong>This Week:</strong> Solved: <span id="weekSolved">0</span> | Unsolved: <span id="weekUnsolved">0</span></p>
-                <p><strong>This Year:</strong> Solved: <span id="yearSolved">0</span> | Unsolved: <span id="yearUnsolved">0</span></p>
-                <p><strong>Total Time Spent Today:</strong> <span id="timeToday">0:00</span></p>
-                <p><strong>Time of Last Problem:</strong> <span id="lastTime">Not Recorded</span></p>
+                <p><strong>Time Spent This Week:</strong> <span id="timeThisWeek">0</span> seconds</p>
             </div>
 
             <div class="subjectStats">
@@ -112,8 +111,7 @@
         let name, timerInterval, timerSeconds = 0;
         const stats = {
             daily: { solved: 0, unsolved: 0, time: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
-            weekly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
-            yearly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+            weekly: { solved: 0, unsolved: 0, time: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
         };
 
         function startSession() {
@@ -137,9 +135,7 @@
             timerInterval = setInterval(() => {
                 if (timerSeconds > 0) {
                     timerSeconds--;
-                    const minutes = Math.floor(timerSeconds / 60);
-                    const seconds = timerSeconds % 60;
-                    document.getElementById("timerDisplay").innerText = `Timer: ${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+                    document.getElementById("timerDisplay").innerText = `Timer: ${Math.floor(timerSeconds / 60)}:${timerSeconds % 60 < 10 ? "0" : ""}${timerSeconds % 60}`;
                 } else {
                     clearInterval(timerInterval);
                     document.getElementById("timerDisplay").innerText = "Time's up!";
@@ -159,29 +155,19 @@
             const subject = document.getElementById("subjectSelect").value;
             stats.daily[type]++;
             stats.weekly[type]++;
-            stats.yearly[type]++;
             stats.daily.subjects[subject]++;
             stats.weekly.subjects[subject]++;
-            stats.yearly.subjects[subject]++;
-
-            if (type === "solved") stats.daily.time += parseInt(document.getElementById("targetTime").value) * 60;
-
-            // Get current time
-            const now = new Date();
-            const timeString = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+            stats.daily.time += timerSeconds;
 
             // Update UI
             document.getElementById("todaySolved").innerText = stats.daily.solved;
             document.getElementById("todayUnsolved").innerText = stats.daily.unsolved;
             document.getElementById("weekSolved").innerText = stats.weekly.solved;
             document.getElementById("weekUnsolved").innerText = stats.weekly.unsolved;
-            document.getElementById("yearSolved").innerText = stats.yearly.solved;
-            document.getElementById("yearUnsolved").innerText = stats.yearly.unsolved;
 
-            const timeSpent = Math.floor(stats.daily.time / 60);
-            const secondsSpent = stats.daily.time % 60;
-            document.getElementById("timeToday").innerText = `${timeSpent}:${secondsSpent < 10 ? "0" : ""}${secondsSpent}`;
-            document.getElementById("lastTime").innerText = timeString;
+            // Time in seconds
+            document.getElementById("timeToday").innerText = stats.daily.time;
+            document.getElementById("timeThisWeek").innerText = stats.weekly.time;
 
             // Update subject-wise stats
             document.getElementById("physicsSolved").innerText = stats.daily.subjects.Physics;
