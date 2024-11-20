@@ -24,12 +24,12 @@
             border-radius: 16px;
             box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
             width: 95%;
-            max-width: 650px;
+            max-width: 750px;
         }
 
         h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
         }
 
         h2 {
@@ -93,18 +93,18 @@
             </select>
             <p>Time Target Per Question (in seconds):</p>
             <input type="number" id="timeTaken" placeholder="Enter time in seconds">
-            <button onclick="startTimer()">Start Timer</button>
+            <button onclick="setTimer()">Start Timer</button>
 
             <div class="stats">
                 <h3>Statistics</h3>
                 <p><strong>Today:</strong></p>
-                <p>Solved: <span id="todaySolved">0</span> | Unsolved: <span id="todayUnsolved">0</span> | Time: <span id="timeToday">0</span> seconds</p>
+                <p>Solved: <span id="todaySolved">0</span> | Unsolved: <span id="todayUnsolved">0</span></p>
 
                 <p><strong>This Week:</strong></p>
-                <p>Solved: <span id="weekSolved">0</span> | Unsolved: <span id="weekUnsolved">0</span> | Time: <span id="timeThisWeek">0</span> seconds</p>
+                <p>Solved: <span id="weekSolved">0</span> | Unsolved: <span id="weekUnsolved">0</span></p>
 
                 <p><strong>This Year:</strong></p>
-                <p>Solved: <span id="yearSolved">0</span> | Unsolved: <span id="yearUnsolved">0</span> | Time: <span id="timeThisYear">0</span> seconds</p>
+                <p>Solved: <span id="yearSolved">0</span> | Unsolved: <span id="yearUnsolved">0</span></p>
 
                 <h3>Subject-wise Problems Solved</h3>
                 <p><strong>Physics:</strong> <span id="physicsSolved">0</span></p>
@@ -115,10 +115,11 @@
     </div>
     <script>
         let timerInterval;
+        let currentTimer = 0;
         const stats = {
-            daily: { solved: 0, unsolved: 0, time: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
-            weekly: { solved: 0, unsolved: 0, time: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
-            yearly: { solved: 0, unsolved: 0, time: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+            daily: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+            weekly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+            yearly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
         };
 
         function startSession() {
@@ -131,14 +132,23 @@
             document.getElementById("greeting").innerText = `Hello, ${name}! You are the best. You can do it!`;
         }
 
-        function startTimer() {
+        function setTimer() {
             const timeTaken = parseInt(document.getElementById("timeTaken").value);
             if (isNaN(timeTaken) || timeTaken <= 0) {
                 alert("Please enter a valid time in seconds.");
                 return;
             }
+            currentTimer = timeTaken; // Save initial time
+            startTimer();
+        }
 
-            let remainingTime = timeTaken;
+        function startTimer() {
+            if (!currentTimer) {
+                alert("Please set a valid timer first.");
+                return;
+            }
+
+            let remainingTime = currentTimer;
             clearInterval(timerInterval);
 
             timerInterval = setInterval(() => {
@@ -153,7 +163,6 @@
                     } else {
                         markUnsolved();
                     }
-                    document.getElementById("timeTaken").value = ""; // Reset input
                 }
             }, 1000);
         }
@@ -167,19 +176,16 @@
         }
 
         function updateStats(type) {
-            const timeTaken = parseInt(document.getElementById("timeTaken").value);
             const subject = document.getElementById("subjectSelect").value;
 
             stats.daily[type]++;
             stats.weekly[type]++;
             stats.yearly[type]++;
-            stats.daily.subjects[subject]++;
-            stats.weekly.subjects[subject]++;
-            stats.yearly.subjects[subject]++;
-            stats.daily.time += timeTaken || 0;
-            stats.weekly.time += timeTaken || 0;
-            stats.yearly.time += timeTaken || 0;
-
+            if (type === "solved") {
+                stats.daily.subjects[subject]++;
+                stats.weekly.subjects[subject]++;
+                stats.yearly.subjects[subject]++;
+            }
             updateUI();
         }
 
@@ -190,10 +196,6 @@
             document.getElementById("weekUnsolved").innerText = stats.weekly.unsolved;
             document.getElementById("yearSolved").innerText = stats.yearly.solved;
             document.getElementById("yearUnsolved").innerText = stats.yearly.unsolved;
-
-            document.getElementById("timeToday").innerText = stats.daily.time;
-            document.getElementById("timeThisWeek").innerText = stats.weekly.time;
-            document.getElementById("timeThisYear").innerText = stats.yearly.time;
 
             document.getElementById("physicsSolved").innerText = stats.daily.subjects.Physics;
             document.getElementById("chemistrySolved").innerText = stats.daily.subjects.Chemistry;
