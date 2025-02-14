@@ -111,7 +111,7 @@
 <body>
   <div class="container">
     <h1>Problem Solving Timer</h1>
-    <!-- Sanskrit Quote from the Bhagavad Gita -->
+    <!-- Bhagavad Gita Quote -->
     <p class="gita-quote">"मनः वायोः इव नियंत्रयितुं न शक्यते"</p>
     
     <label for="userName">Enter Your Name:</label>
@@ -159,14 +159,14 @@
     let startTime = 0;
     let questionRecords = []; // Acts as our "database"
 
-    // Update stats objects for all four subjects.
+    // Stats for all four subjects.
     const stats = {
       daily: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Biology: 0, Mathematics: 0 } },
       weekly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Biology: 0, Mathematics: 0 } },
       yearly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Biology: 0, Mathematics: 0 } },
     };
 
-    // Load saved records from localStorage (if any)
+    // Load saved records (if any) from localStorage.
     function loadRecords() {
       const records = localStorage.getItem("questionRecords");
       if (records) {
@@ -213,23 +213,31 @@
         } else {
           clearInterval(timerInterval);
           const solved = confirm("Time is up! Did you solve the problem?");
-          const elapsedTime = currentTimer;
+          // If time runs out naturally, we assume the intended elapsed time was the target.
           if (solved) {
-            markSolved(elapsedTime);
+            markSolved(currentTimer);
           } else {
-            markUnsolved(elapsedTime);
+            markUnsolved(currentTimer);
           }
+          // Reset startTime after finishing a session.
+          startTime = 0;
         }
       }, 1000);
     }
 
-    // Stop the timer manually and record the elapsed time.
+    // When stopping manually, ensure startTime is set; otherwise warn the user.
     function stopTimer() {
+      if (!startTime) {
+        alert("Timer has not started properly!");
+        return;
+      }
       clearInterval(timerInterval);
       const endTime = Date.now();
       const elapsedTime = Math.floor((endTime - startTime) / 1000);
       alert("Timer stopped. Time taken: " + elapsedTime + " seconds. Marking as unsolved.");
       markUnsolved(elapsedTime);
+      // Reset startTime to avoid using a stale value.
+      startTime = 0;
     }
 
     function markSolved(elapsedTime) {
@@ -248,7 +256,7 @@
         stats.weekly.subjects[subject]++;
         stats.yearly.subjects[subject]++;
       }
-      // Save this question's record to our "database"
+      // Record the question's data.
       const record = {
         subject: subject,
         solved: type === "solved",
@@ -272,7 +280,7 @@
       document.getElementById("mathematicsSolved").innerText = stats.daily.subjects.Mathematics;
     }
 
-    // Advanced analytics using an enhanced neural network model and Chart.js.
+    // Advanced analytics: compute statistics, show a Chart.js bar chart, and run a neural network prediction.
     async function runAdvancedAnalytics() {
       if (questionRecords.length === 0) {
         alert("No data available for analytics.");
@@ -288,14 +296,14 @@
       const avgUnsolvedTime = (questionRecords.filter(r => !r.solved)
                                .reduce((sum, r) => sum + r.timeSpent, 0) / (unsolvedCount || 1)).toFixed(2);
       
-      // Prepare subject-wise counts for Chart.js.
+      // Prepare data for Chart.js.
       const subjects = ["Physics", "Chemistry", "Biology", "Mathematics"];
       const solvedPerSubject = subjects.map(sub => questionRecords.filter(r => r.subject === sub && r.solved).length);
       const unsolvedPerSubject = subjects.map(sub => questionRecords.filter(r => r.subject === sub && !r.solved).length);
       
-      // Display a bar chart using Chart.js.
+      // Render a bar chart.
       const ctx = document.getElementById('analyticsChart').getContext('2d');
-      if(window.myChart instanceof Chart) {
+      if (window.myChart instanceof Chart) {
         window.myChart.destroy();
       }
       window.myChart = new Chart(ctx, {
@@ -327,8 +335,8 @@
         }
       });
       
-      // Prepare features for an advanced neural network.
-      // Each record is represented by [timeSpent, one-hot(Physics, Chemistry, Biology, Mathematics)].
+      // Prepare data for the neural network.
+      // Each record: [timeSpent, one-hot for (Physics, Chemistry, Biology, Mathematics)]
       const subjectMap = {
         "Physics": [1, 0, 0, 0],
         "Chemistry": [0, 1, 0, 0],
@@ -337,20 +345,19 @@
       };
       const X_data = questionRecords.map(r => [r.timeSpent, ...subjectMap[r.subject]]);
       const y_data = questionRecords.map(r => r.solved ? 1 : 0);
-      const xs = tf.tensor2d(X_data); // Shape: [n, 5] (timeSpent + 4 one-hot features)
+      const xs = tf.tensor2d(X_data); // Shape: [n, 5]
       const ys = tf.tensor2d(y_data, [y_data.length, 1]);
       
-      // Build an advanced neural network model.
+      // Build and train the neural network model.
       const model = tf.sequential();
       model.add(tf.layers.dense({ units: 16, inputShape: [5], activation: 'relu' }));
       model.add(tf.layers.dense({ units: 8, activation: 'relu' }));
       model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
       model.compile({ optimizer: 'adam', loss: 'binaryCrossentropy' });
       
-      // Train the model.
       await model.fit(xs, ys, { epochs: 100, verbose: 0 });
       
-      // Prompt user for a prediction.
+      // Get prediction from the user.
       let predSubject = prompt("Enter a subject for prediction (Physics, Chemistry, Biology, Mathematics):");
       if (!subjects.includes(predSubject)) {
         alert("Invalid subject input.");
@@ -365,7 +372,7 @@
       const prediction = model.predict(inputFeatures);
       const predValue = (await prediction.array())[0][0];
       
-      // Compose and display an advanced analytics summary.
+      // Compose and display the analytics summary.
       const summary = `
 Total Questions: ${totalQuestions}
 Solved: ${solvedCount} | Unsolved: ${unsolvedCount}
