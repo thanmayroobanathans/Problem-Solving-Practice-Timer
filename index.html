@@ -1,209 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Problem Solving Practice Timer</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #e0f7e0; /* Subtle green */
-            color: #2d3436;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Problem Solving Practice Timer</title>
+  <!-- TensorFlow.js for neural computing -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #e0f7e0; /* Subtle green */
+      color: #2d3436;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
 
-        .container {
-            text-align: center;
-            background-color: #a8d5a8; /* Calm green */
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
-            width: 95%;
-            max-width: 750px;
-        }
+    .container {
+      text-align: center;
+      background-color: #a8d5a8; /* Calm green */
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
+      width: 95%;
+      max-width: 750px;
+    }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
 
-        h2 {
-            color: #2b9348;
-        }
+    h2 {
+      color: #2b9348;
+    }
 
-        button {
-            margin: 10px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            background: #52b788;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    button {
+      margin: 10px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background: #52b788;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-        button:hover {
-            background: #40916c;
-        }
+    button:hover {
+      background: #40916c;
+    }
 
-        input, select {
-            margin: 10px;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            font-size: 16px;
-            width: calc(100% - 24px);
-        }
+    input, select {
+      margin: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      width: calc(100% - 24px);
+    }
 
-        .stats {
-            margin-top: 20px;
-            text-align: left;
-            background: #e5ffe5;
-            padding: 15px;
-            border-radius: 10px;
-        }
+    .stats {
+      margin-top: 20px;
+      text-align: left;
+      background: #e5ffe5;
+      padding: 15px;
+      border-radius: 10px;
+    }
 
-        .quote {
-            font-style: italic;
-            margin-bottom: 20px;
-        }
-    </style>
+    .quote {
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Problem Solving Practice Timer</h1>
-        <p class="quote">“Be like water making its way through cracks. Do not be assertive, but adjust to the object, and you shall find a way around or through it. If nothing within you stays rigid, outward things will disclose themselves.
+  <div class="container">
+    <h1>Problem Solving Practice Timer</h1>
+    <p class="quote">
+      “Be like water making its way through cracks. Do not be assertive, but adjust to the object, and you shall find a way around or through it. If nothing within you stays rigid, outward things will disclose themselves.
 
-Empty your mind, be formless. Shapeless, like water. If you put water into a cup, it becomes the cup. You put water into a bottle and it becomes the bottle. You put it in a teapot, it becomes the teapot. Now, water can flow or it can crash. Be water, my friend.”
-― Bruce Lee</p>
+      Empty your mind, be formless. Shapeless, like water. If you put water into a cup, it becomes the cup. You put water into a bottle and it becomes the bottle. You put it in a teapot, it becomes the teapot. Now, water can flow or it can crash. Be water, my friend.”
+      ― Bruce Lee
+    </p>
 
-        <label for="userName">Enter Your Name:</label>
-        <input type="text" id="userName" placeholder="Your Name">
-        <button onclick="startSession()">Start Session</button>
+    <label for="userName">Enter Your Name:</label>
+    <input type="text" id="userName" placeholder="Your Name" />
+    <button onclick="startSession()">Start Session</button>
 
-        <div id="main" style="display: none;">
-            <h2 id="greeting"></h2>
-            <label for="subjectSelect">Choose Subject:</label>
-            <select id="subjectSelect">
-                <option value="Physics">Physics</option>
-                <option value="Chemistry">Chemistry</option>
-                <option value="Mathematics">Mathematics</option>
-            </select>
-            <p>Time Target Per Question (in seconds):</p>
-            <input type="number" id="timeTaken" placeholder="Enter time in seconds">
-            <button onclick="setTimer()">Start Timer</button>
+    <div id="main" style="display: none;">
+      <h2 id="greeting"></h2>
+      <label for="subjectSelect">Choose Subject:</label>
+      <select id="subjectSelect">
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Mathematics">Mathematics</option>
+      </select>
+      <p>Time Target Per Question (in seconds):</p>
+      <input type="number" id="timeTaken" placeholder="Enter time in seconds" />
+      <button onclick="setTimer()">Start Timer</button>
+      <button onclick="stopTimer()">Stop Timer</button>
 
-            <div class="stats">
-                <h3>Statistics</h3>
-                <p><strong>Today:</strong></p>
-                <p>Solved: <span id="todaySolved">0</span> | Unsolved: <span id="todayUnsolved">0</span></p>
+      <div class="stats">
+        <h3>Statistics</h3>
+        <p><strong>Today:</strong></p>
+        <p>Solved: <span id="todaySolved">0</span> | Unsolved: <span id="todayUnsolved">0</span></p>
 
-                <p><strong>This Week:</strong></p>
-                <p>Solved: <span id="weekSolved">0</span> | Unsolved: <span id="weekUnsolved">0</span></p>
+        <p><strong>This Week:</strong></p>
+        <p>Solved: <span id="weekSolved">0</span> | Unsolved: <span id="weekUnsolved">0</span></p>
 
-                <p><strong>This Year:</strong></p>
-                <p>Solved: <span id="yearSolved">0</span> | Unsolved: <span id="yearUnsolved">0</span></p>
+        <p><strong>This Year:</strong></p>
+        <p>Solved: <span id="yearSolved">0</span> | Unsolved: <span id="yearUnsolved">0</span></p>
 
-                <h3>Subject-wise Problems Solved</h3>
-                <p><strong>Physics:</strong> <span id="physicsSolved">0</span></p>
-                <p><strong>Chemistry:</strong> <span id="chemistrySolved">0</span></p>
-                <p><strong>Mathematics:</strong> <span id="mathSolved">0</span></p>
-            </div>
-        </div>
+        <h3>Subject-wise Problems Solved</h3>
+        <p><strong>Physics:</strong> <span id="physicsSolved">0</span></p>
+        <p><strong>Chemistry:</strong> <span id="chemistrySolved">0</span></p>
+        <p><strong>Mathematics:</strong> <span id="mathSolved">0</span></p>
+      </div>
+      <button onclick="runAdvancedAnalytics()">Run Advanced Analytics</button>
     </div>
-    <script>
-        let timerInterval;
-        let currentTimer = 0;
-        const stats = {
-            daily: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
-            weekly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
-            yearly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
-        };
+  </div>
 
-        function startSession() {
-            const name = document.getElementById("userName").value.trim();
-            if (!name) {
-                alert("Please enter your name.");
-                return;
-            }
-            document.getElementById("main").style.display = "block";
-            document.getElementById("greeting").innerText = `Hello, ${name}! You are the best. You can do it!`;
+  <script>
+    let timerInterval;
+    let currentTimer = 0;
+    let startTime = 0;
+    let questionRecords = []; // This array acts as our "database"
+
+    const stats = {
+      daily: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+      weekly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+      yearly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Mathematics: 0 } },
+    };
+
+    // Load saved records from localStorage (if any)
+    function loadRecords() {
+      const records = localStorage.getItem("questionRecords");
+      if (records) {
+        questionRecords = JSON.parse(records);
+        // Optionally, you can recalculate stats from these records.
+      }
+    }
+
+    function saveRecords() {
+      localStorage.setItem("questionRecords", JSON.stringify(questionRecords));
+    }
+
+    loadRecords();
+
+    function startSession() {
+      const name = document.getElementById("userName").value.trim();
+      if (!name) {
+        alert("Please enter your name.");
+        return;
+      }
+      document.getElementById("main").style.display = "block";
+      document.getElementById("greeting").innerText = `Hello, ${name}! You are the best. You can do it!`;
+    }
+
+    function setTimer() {
+      const timeTaken = parseInt(document.getElementById("timeTaken").value);
+      if (isNaN(timeTaken) || timeTaken <= 0) {
+        alert("Please enter a valid time in seconds.");
+        return;
+      }
+      currentTimer = timeTaken;
+      startTimer();
+    }
+
+    function startTimer() {
+      if (!currentTimer) {
+        alert("Please set a valid timer first.");
+        return;
+      }
+      let remainingTime = currentTimer;
+      startTime = Date.now();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (remainingTime > 0) {
+          remainingTime--;
+          document.getElementById("timeTaken").value = remainingTime;
+        } else {
+          clearInterval(timerInterval);
+          // When time runs out, ask if the problem was solved
+          const solved = confirm("Time is up! Did you solve the problem?");
+          const elapsedTime = currentTimer; // full duration
+          if (solved) {
+            markSolved(elapsedTime);
+          } else {
+            markUnsolved(elapsedTime);
+          }
         }
+      }, 1000);
+    }
 
-        function setTimer() {
-            const timeTaken = parseInt(document.getElementById("timeTaken").value);
-            if (isNaN(timeTaken) || timeTaken <= 0) {
-                alert("Please enter a valid time in seconds.");
-                return;
-            }
-            currentTimer = timeTaken; // Save initial time
-            startTimer();
-        }
+    // New function to allow manual stop of the timer
+    function stopTimer() {
+      clearInterval(timerInterval);
+      const endTime = Date.now();
+      const elapsedTime = Math.floor((endTime - startTime) / 1000);
+      alert("Timer stopped manually. Time taken: " + elapsedTime + " seconds. Marking as unsolved.");
+      markUnsolved(elapsedTime);
+    }
 
-        function startTimer() {
-            if (!currentTimer) {
-                alert("Please set a valid timer first.");
-                return;
-            }
+    // Record a solved question along with the elapsed time
+    function markSolved(elapsedTime) {
+      updateStats("solved", elapsedTime);
+    }
 
-            let remainingTime = currentTimer;
-            clearInterval(timerInterval);
+    // Record an unsolved question along with the elapsed time
+    function markUnsolved(elapsedTime) {
+      updateStats("unsolved", elapsedTime);
+    }
 
-            timerInterval = setInterval(() => {
-                if (remainingTime > 0) {
-                    remainingTime--;
-                    document.getElementById("timeTaken").value = remainingTime;
-                } else {
-                    clearInterval(timerInterval);
-                    const solved = confirm("Time is up! Did you solve the problem?");
-                    if (solved) {
-                        markSolved();
-                    } else {
-                        markUnsolved();
-                    }
-                }
-            }, 1000);
-        }
+    // Update stats and store question data
+    function updateStats(type, timeSpent) {
+      const subject = document.getElementById("subjectSelect").value;
 
-        function markSolved() {
-            updateStats("solved");
-        }
+      stats.daily[type]++;
+      stats.weekly[type]++;
+      stats.yearly[type]++;
+      if (type === "solved") {
+        stats.daily.subjects[subject]++;
+        stats.weekly.subjects[subject]++;
+        stats.yearly.subjects[subject]++;
+      }
 
-        function markUnsolved() {
-            updateStats("unsolved");
-        }
+      // Save this question's record to our "database"
+      const record = {
+        subject: subject,
+        solved: type === "solved",
+        timeSpent: timeSpent,
+        timestamp: new Date().toISOString()
+      };
+      questionRecords.push(record);
+      saveRecords();
 
-        function updateStats(type) {
-            const subject = document.getElementById("subjectSelect").value;
+      updateUI();
+    }
 
-            stats.daily[type]++;
-            stats.weekly[type]++;
-            stats.yearly[type]++;
-            if (type === "solved") {
-                stats.daily.subjects[subject]++;
-                stats.weekly.subjects[subject]++;
-                stats.yearly.subjects[subject]++;
-            }
-            updateUI();
-        }
+    function updateUI() {
+      document.getElementById("todaySolved").innerText = stats.daily.solved;
+      document.getElementById("todayUnsolved").innerText = stats.daily.unsolved;
+      document.getElementById("weekSolved").innerText = stats.weekly.solved;
+      document.getElementById("weekUnsolved").innerText = stats.weekly.unsolved;
+      document.getElementById("yearSolved").innerText = stats.yearly.solved;
+      document.getElementById("yearUnsolved").innerText = stats.yearly.unsolved;
 
-        function updateUI() {
-            document.getElementById("todaySolved").innerText = stats.daily.solved;
-            document.getElementById("todayUnsolved").innerText = stats.daily.unsolved;
-            document.getElementById("weekSolved").innerText = stats.weekly.solved;
-            document.getElementById("weekUnsolved").innerText = stats.weekly.unsolved;
-            document.getElementById("yearSolved").innerText = stats.yearly.solved;
-            document.getElementById("yearUnsolved").innerText = stats.yearly.unsolved;
+      document.getElementById("physicsSolved").innerText = stats.daily.subjects.Physics;
+      document.getElementById("chemistrySolved").innerText = stats.daily.subjects.Chemistry;
+      document.getElementById("mathSolved").innerText = stats.daily.subjects.Mathematics;
+    }
 
-            document.getElementById("physicsSolved").innerText = stats.daily.subjects.Physics;
-            document.getElementById("chemistrySolved").innerText = stats.daily.subjects.Chemistry;
-            document.getElementById("mathSolved").innerText = stats.daily.subjects.Mathematics;
-        }
-    </script>
+    // Advanced analytics using a simple neural network (via TensorFlow.js)
+    async function runAdvancedAnalytics() {
+      if (questionRecords.length === 0) {
+        alert("No data available for analytics.");
+        return;
+      }
+
+      // For demonstration, we’ll build a model that predicts the probability of solving a question
+      // based solely on the time spent. (You can extend this by adding more features.)
+      const xs = tf.tensor2d(questionRecords.map(r => [r.timeSpent]));
+      const ys = tf.tensor2d(questionRecords.map(r => [r.solved ? 1 : 0]));
+
+      // Build a simple model.
+      const model = tf.sequential();
+      model.add(tf.layers.dense({ units: 4, inputShape: [1], activation: 'relu' }));
+      model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
+      model.compile({ optimizer: 'sgd', loss: 'binaryCrossentropy' });
+
+      // Train the model
+      await model.fit(xs, ys, { epochs: 50 });
+
+      const inputTime = parseFloat(prompt("Enter a timeSpent value to predict the probability of solving:"));
+      if (isNaN(inputTime)) {
+        alert("Invalid input.");
+        return;
+      }
+      const prediction = model.predict(tf.tensor2d([[inputTime]]));
+      prediction.array().then(array => {
+        alert("Predicted probability of solving: " + array[0][0].toFixed(2));
+      });
+    }
+  </script>
 </body>
 </html>
