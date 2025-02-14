@@ -124,6 +124,8 @@
       <select id="subjectSelect">
         <option value="Physics">Physics</option>
         <option value="Chemistry">Chemistry</option>
+        <option value="Biology">Biology</option>
+        <option value="Mathematics">Mathematics</option>
       </select>
       <label for="timeTaken">Time Target Per Question (in seconds):</label>
       <input type="number" id="timeTaken" placeholder="Enter time in seconds" />
@@ -143,6 +145,8 @@
         <h3>Subject-wise Progress</h3>
         <p><strong>Physics:</strong> <span id="physicsSolved">0</span></p>
         <p><strong>Chemistry:</strong> <span id="chemistrySolved">0</span></p>
+        <p><strong>Biology:</strong> <span id="biologySolved">0</span></p>
+        <p><strong>Mathematics:</strong> <span id="mathematicsSolved">0</span></p>
       </div>
       <button onclick="runAdvancedAnalytics()">Run Advanced Analytics</button>
       <canvas id="analyticsChart" width="400" height="200"></canvas>
@@ -155,11 +159,11 @@
     let startTime = 0;
     let questionRecords = []; // Acts as our "database"
 
-    // Stats objects track overall and subject-specific counts.
+    // Update stats objects for all four subjects.
     const stats = {
-      daily: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0 } },
-      weekly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0 } },
-      yearly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0 } },
+      daily: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Biology: 0, Mathematics: 0 } },
+      weekly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Biology: 0, Mathematics: 0 } },
+      yearly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0, Biology: 0, Mathematics: 0 } },
     };
 
     // Load saved records from localStorage (if any)
@@ -264,6 +268,8 @@
       document.getElementById("yearUnsolved").innerText = stats.yearly.unsolved;
       document.getElementById("physicsSolved").innerText = stats.daily.subjects.Physics;
       document.getElementById("chemistrySolved").innerText = stats.daily.subjects.Chemistry;
+      document.getElementById("biologySolved").innerText = stats.daily.subjects.Biology;
+      document.getElementById("mathematicsSolved").innerText = stats.daily.subjects.Mathematics;
     }
 
     // Advanced analytics using an enhanced neural network model and Chart.js.
@@ -283,7 +289,7 @@
                                .reduce((sum, r) => sum + r.timeSpent, 0) / (unsolvedCount || 1)).toFixed(2);
       
       // Prepare subject-wise counts for Chart.js.
-      const subjects = ["Physics", "Chemistry"];
+      const subjects = ["Physics", "Chemistry", "Biology", "Mathematics"];
       const solvedPerSubject = subjects.map(sub => questionRecords.filter(r => r.subject === sub && r.solved).length);
       const unsolvedPerSubject = subjects.map(sub => questionRecords.filter(r => r.subject === sub && !r.solved).length);
       
@@ -322,19 +328,21 @@
       });
       
       // Prepare features for an advanced neural network.
-      // Each record is represented by [timeSpent, one-hot(Physics, Chemistry)].
+      // Each record is represented by [timeSpent, one-hot(Physics, Chemistry, Biology, Mathematics)].
       const subjectMap = {
-        "Physics": [1, 0],
-        "Chemistry": [0, 1]
+        "Physics": [1, 0, 0, 0],
+        "Chemistry": [0, 1, 0, 0],
+        "Biology": [0, 0, 1, 0],
+        "Mathematics": [0, 0, 0, 1]
       };
       const X_data = questionRecords.map(r => [r.timeSpent, ...subjectMap[r.subject]]);
       const y_data = questionRecords.map(r => r.solved ? 1 : 0);
-      const xs = tf.tensor2d(X_data); // Shape: [n, 3]
+      const xs = tf.tensor2d(X_data); // Shape: [n, 5] (timeSpent + 4 one-hot features)
       const ys = tf.tensor2d(y_data, [y_data.length, 1]);
       
       // Build an advanced neural network model.
       const model = tf.sequential();
-      model.add(tf.layers.dense({ units: 16, inputShape: [3], activation: 'relu' }));
+      model.add(tf.layers.dense({ units: 16, inputShape: [5], activation: 'relu' }));
       model.add(tf.layers.dense({ units: 8, activation: 'relu' }));
       model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
       model.compile({ optimizer: 'adam', loss: 'binaryCrossentropy' });
@@ -343,7 +351,7 @@
       await model.fit(xs, ys, { epochs: 100, verbose: 0 });
       
       // Prompt user for a prediction.
-      let predSubject = prompt("Enter a subject for prediction (Physics, Chemistry):");
+      let predSubject = prompt("Enter a subject for prediction (Physics, Chemistry, Biology, Mathematics):");
       if (!subjects.includes(predSubject)) {
         alert("Invalid subject input.");
         return;
