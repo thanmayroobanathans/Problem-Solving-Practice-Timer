@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hare Krishna Timer</title>
+  <title>Problem Solving Timer</title>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <!-- TensorFlow.js for neural computing -->
@@ -12,12 +12,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --primary-color: #ff9933; /* Saffron */
-      --secondary-color: #ffad66;
-      --bg-gradient: linear-gradient(135deg, #fff7e0, #fff1e0);
+      --primary-color: #2d6a4f;
+      --secondary-color: #52b788;
+      --bg-gradient: linear-gradient(135deg, #e0f7fa, #ffffff);
       --light-bg: #ffffff;
       --text-color: #333;
-      --shadow-color: rgba(0, 0, 0, 0.2);
+      --shadow-color: rgba(0, 0, 0, 0.15);
     }
     * { box-sizing: border-box; }
     body {
@@ -46,7 +46,7 @@
     }
     h1 { margin-top: 0; font-size: 2.5rem; color: var(--primary-color); }
     h2 { color: var(--primary-color); }
-    p.mantra {
+    p.gita-quote {
       font-style: italic;
       color: #555;
       margin-bottom: 20px;
@@ -94,7 +94,7 @@
     .stats {
       margin-top: 20px;
       text-align: left;
-      background: #fff9f0;
+      background: #f1f8e9;
       padding: 20px;
       border-radius: 10px;
       box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.05);
@@ -110,22 +110,20 @@
 </head>
 <body>
   <div class="container">
-    <h1>Hare Krishna Timer</h1>
-    <p class="mantra">
-      Hare Krishna, Hare Krishna, Krishna Krishna, Hare Hare,<br>
-      Hare Rama, Hare Rama, Rama Rama, Hare Hare.
-    </p>
-    <label for="userName">Enter Your Devotee Name:</label>
+    <h1>Problem Solving Timer</h1>
+    <!-- Sanskrit Quote from the Bhagavad Gita -->
+    <p class="gita-quote">"मनः वायोः इव नियंत्रयितुं न शक्यते"</p>
+    
+    <label for="userName">Enter Your Name:</label>
     <input type="text" id="userName" placeholder="Your Name" />
-    <button onclick="startSession()">Begin Your Journey</button>
+    <button onclick="startSession()">Start Session</button>
     
     <div id="main" style="display: none;">
       <h2 id="greeting"></h2>
-      <label for="subjectSelect">Choose Your Study Subject:</label>
+      <label for="subjectSelect">Choose Your Subject:</label>
       <select id="subjectSelect">
-        <option value="Philosophy">Philosophy</option>
-        <option value="Scriptures">Scriptures</option>
-        <option value="Mathematics">Mathematics</option>
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
       </select>
       <label for="timeTaken">Time Target Per Question (in seconds):</label>
       <input type="number" id="timeTaken" placeholder="Enter time in seconds" />
@@ -143,9 +141,8 @@
         <p><strong>This Year:</strong></p>
         <p>Solved: <span id="yearSolved">0</span> | Unsolved: <span id="yearUnsolved">0</span></p>
         <h3>Subject-wise Progress</h3>
-        <p><strong>Philosophy:</strong> <span id="philosophySolved">0</span></p>
-        <p><strong>Scriptures:</strong> <span id="scripturesSolved">0</span></p>
-        <p><strong>Mathematics:</strong> <span id="mathSolved">0</span></p>
+        <p><strong>Physics:</strong> <span id="physicsSolved">0</span></p>
+        <p><strong>Chemistry:</strong> <span id="chemistrySolved">0</span></p>
       </div>
       <button onclick="runAdvancedAnalytics()">Run Advanced Analytics</button>
       <canvas id="analyticsChart" width="400" height="200"></canvas>
@@ -158,10 +155,11 @@
     let startTime = 0;
     let questionRecords = []; // Acts as our "database"
 
+    // Stats objects track overall and subject-specific counts.
     const stats = {
-      daily: { solved: 0, unsolved: 0, subjects: { Philosophy: 0, Scriptures: 0, Mathematics: 0 } },
-      weekly: { solved: 0, unsolved: 0, subjects: { Philosophy: 0, Scriptures: 0, Mathematics: 0 } },
-      yearly: { solved: 0, unsolved: 0, subjects: { Philosophy: 0, Scriptures: 0, Mathematics: 0 } },
+      daily: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0 } },
+      weekly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0 } },
+      yearly: { solved: 0, unsolved: 0, subjects: { Physics: 0, Chemistry: 0 } },
     };
 
     // Load saved records from localStorage (if any)
@@ -179,11 +177,11 @@
     function startSession() {
       const name = document.getElementById("userName").value.trim();
       if (!name) {
-        alert("Please enter your name, dear devotee.");
+        alert("Please enter your name.");
         return;
       }
       document.getElementById("main").style.display = "block";
-      document.getElementById("greeting").innerText = `Hare Krishna, ${name}! Remember, you are an eternal spark of divinity.`;
+      document.getElementById("greeting").innerText = `Welcome, ${name}! Focus and excel in your problem solving.`;
     }
 
     function setTimer() {
@@ -210,7 +208,7 @@
           document.getElementById("timeTaken").value = remainingTime;
         } else {
           clearInterval(timerInterval);
-          const solved = confirm("Time is up! Did you find the answer with Krishna’s guidance?");
+          const solved = confirm("Time is up! Did you solve the problem?");
           const elapsedTime = currentTimer;
           if (solved) {
             markSolved(elapsedTime);
@@ -226,7 +224,7 @@
       clearInterval(timerInterval);
       const endTime = Date.now();
       const elapsedTime = Math.floor((endTime - startTime) / 1000);
-      alert("Timer stopped. Time taken: " + elapsedTime + " seconds. Marking as unsolved. May Krishna guide you next time.");
+      alert("Timer stopped. Time taken: " + elapsedTime + " seconds. Marking as unsolved.");
       markUnsolved(elapsedTime);
     }
 
@@ -264,12 +262,11 @@
       document.getElementById("weekUnsolved").innerText = stats.weekly.unsolved;
       document.getElementById("yearSolved").innerText = stats.yearly.solved;
       document.getElementById("yearUnsolved").innerText = stats.yearly.unsolved;
-      document.getElementById("philosophySolved").innerText = stats.daily.subjects.Philosophy;
-      document.getElementById("scripturesSolved").innerText = stats.daily.subjects.Scriptures;
-      document.getElementById("mathSolved").innerText = stats.daily.subjects.Mathematics;
+      document.getElementById("physicsSolved").innerText = stats.daily.subjects.Physics;
+      document.getElementById("chemistrySolved").innerText = stats.daily.subjects.Chemistry;
     }
 
-    // Advanced analytics using an enhanced neural network model and Chart.js for visualization.
+    // Advanced analytics using an enhanced neural network model and Chart.js.
     async function runAdvancedAnalytics() {
       if (questionRecords.length === 0) {
         alert("No data available for analytics.");
@@ -280,11 +277,13 @@
       const totalQuestions = questionRecords.length;
       const solvedCount = questionRecords.filter(r => r.solved).length;
       const unsolvedCount = totalQuestions - solvedCount;
-      const avgSolvedTime = (questionRecords.filter(r => r.solved).reduce((sum, r) => sum + r.timeSpent, 0) / (solvedCount || 1)).toFixed(2);
-      const avgUnsolvedTime = (questionRecords.filter(r => !r.solved).reduce((sum, r) => sum + r.timeSpent, 0) / (unsolvedCount || 1)).toFixed(2);
+      const avgSolvedTime = (questionRecords.filter(r => r.solved)
+                             .reduce((sum, r) => sum + r.timeSpent, 0) / (solvedCount || 1)).toFixed(2);
+      const avgUnsolvedTime = (questionRecords.filter(r => !r.solved)
+                               .reduce((sum, r) => sum + r.timeSpent, 0) / (unsolvedCount || 1)).toFixed(2);
       
       // Prepare subject-wise counts for Chart.js.
-      const subjects = ["Philosophy", "Scriptures", "Mathematics"];
+      const subjects = ["Physics", "Chemistry"];
       const solvedPerSubject = subjects.map(sub => questionRecords.filter(r => r.subject === sub && r.solved).length);
       const unsolvedPerSubject = subjects.map(sub => questionRecords.filter(r => r.subject === sub && !r.solved).length);
       
@@ -301,12 +300,12 @@
             {
               label: 'Solved',
               data: solvedPerSubject,
-              backgroundColor: 'rgba(255, 153, 51, 0.7)'
+              backgroundColor: 'rgba(46, 106, 79, 0.7)'
             },
             {
               label: 'Unsolved',
               data: unsolvedPerSubject,
-              backgroundColor: 'rgba(255, 173, 102, 0.7)'
+              backgroundColor: 'rgba(82, 183, 136, 0.7)'
             }
           ]
         },
@@ -323,20 +322,19 @@
       });
       
       // Prepare features for an advanced neural network.
-      // Each record is represented by [timeSpent, one-hot(Philosophy, Scriptures, Mathematics)].
+      // Each record is represented by [timeSpent, one-hot(Physics, Chemistry)].
       const subjectMap = {
-        "Philosophy": [1, 0, 0],
-        "Scriptures": [0, 1, 0],
-        "Mathematics": [0, 0, 1]
+        "Physics": [1, 0],
+        "Chemistry": [0, 1]
       };
       const X_data = questionRecords.map(r => [r.timeSpent, ...subjectMap[r.subject]]);
       const y_data = questionRecords.map(r => r.solved ? 1 : 0);
-      const xs = tf.tensor2d(X_data); // Shape: [n, 4]
+      const xs = tf.tensor2d(X_data); // Shape: [n, 3]
       const ys = tf.tensor2d(y_data, [y_data.length, 1]);
       
-      // Build a more advanced neural network model.
+      // Build an advanced neural network model.
       const model = tf.sequential();
-      model.add(tf.layers.dense({ units: 16, inputShape: [4], activation: 'relu' }));
+      model.add(tf.layers.dense({ units: 16, inputShape: [3], activation: 'relu' }));
       model.add(tf.layers.dense({ units: 8, activation: 'relu' }));
       model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
       model.compile({ optimizer: 'adam', loss: 'binaryCrossentropy' });
@@ -345,13 +343,13 @@
       await model.fit(xs, ys, { epochs: 100, verbose: 0 });
       
       // Prompt user for a prediction.
-      let predSubject = prompt("Enter a subject for prediction (Philosophy, Scriptures, Mathematics):");
-      if(!subjects.includes(predSubject)) {
+      let predSubject = prompt("Enter a subject for prediction (Physics, Chemistry):");
+      if (!subjects.includes(predSubject)) {
         alert("Invalid subject input.");
         return;
       }
       let predTime = parseFloat(prompt("Enter a time (in seconds) for prediction:"));
-      if(isNaN(predTime) || predTime <= 0) {
+      if (isNaN(predTime) || predTime <= 0) {
         alert("Invalid time input.");
         return;
       }
@@ -369,7 +367,7 @@ Average Time (Unsolved): ${avgUnsolvedTime} sec
 Advanced Prediction for "${predSubject}" with ${predTime} sec:
 Predicted probability of solving: ${(predValue * 100).toFixed(2)}%
 
-May Krishna bless your learning journey!
+May your efforts bring clarity and success!
       `;
       alert(summary);
     }
